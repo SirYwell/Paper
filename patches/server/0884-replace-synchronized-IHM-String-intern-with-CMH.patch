@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: SirYwell <hannesgreule@outlook.de>
+Date: Sat, 19 Mar 2022 16:42:19 +0100
+Subject: [PATCH] replace synchronized IHM + String#intern with CMH
+
+
+diff --git a/src/main/java/net/minecraft/resources/ResourceKey.java b/src/main/java/net/minecraft/resources/ResourceKey.java
+index 9bbb68296b166df76b1ad8d7d52d3c0708cfd6cb..827f35bc3e2d63b338ca913fb86aef097f9ad10f 100644
+--- a/src/main/java/net/minecraft/resources/ResourceKey.java
++++ b/src/main/java/net/minecraft/resources/ResourceKey.java
+@@ -9,7 +9,7 @@ import java.util.function.Function;
+ import net.minecraft.core.Registry;
+ 
+ public class ResourceKey<T> {
+-    private static final Map<String, ResourceKey<?>> VALUES = Collections.synchronizedMap(Maps.newIdentityHashMap());
++    private static final Map<String, ResourceKey<?>> VALUES = new java.util.concurrent.ConcurrentHashMap<>();
+     private final ResourceLocation registryName;
+     private final ResourceLocation location;
+ 
+@@ -28,8 +28,8 @@ public class ResourceKey<T> {
+     }
+ 
+     private static <T> ResourceKey<T> create(ResourceLocation registry, ResourceLocation value) {
+-        String string = (registry + ":" + value).intern();
+-        return VALUES.computeIfAbsent(string, (id) -> {
++        String string = (registry + ":" + value); // Paper - do not intern string
++        return (ResourceKey<T>) VALUES.computeIfAbsent(string, (id) -> { // Paper - fix decompiler error
+             return new ResourceKey(registry, value);
+         });
+     }
+@@ -49,7 +49,7 @@ public class ResourceKey<T> {
+     }
+ 
+     public <E> Optional<ResourceKey<E>> cast(ResourceKey<? extends Registry<E>> registryRef) {
+-        return this.isFor(registryRef) ? Optional.of(this) : Optional.empty();
++        return this.isFor(registryRef) ? Optional.of((ResourceKey<E>) this) : Optional.empty(); // Paper - fix decompiler error
+     }
+ 
+     public ResourceLocation location() {

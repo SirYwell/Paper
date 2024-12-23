@@ -184,7 +184,7 @@ tasks.withType<Javadoc> {
         "https://javadoc.io/doc/org.jetbrains/annotations/$annotationsVersion/", // Paper - we don't want Java 5 annotations
         // "https://javadoc.io/doc/net.md-5/bungeecord-chat/$bungeeCordChatVersion/", // Paper - don't link to bungee chat
         // Paper start - add missing javadoc links
-        "https://javadoc.io/doc/org.joml/joml/1.10.8/index.html",
+        "https://javadoc.io/doc/org.joml/joml/1.10.8/",
         "https://www.javadoc.io/doc/com.google.code.gson/gson/2.11.0",
         "https://jspecify.dev/docs/api/",
         // Paper end
